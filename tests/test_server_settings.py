@@ -205,3 +205,14 @@ def test_update_detects_newer_release_and_survives_offline(client, monkeypatch):
         raise OSError("no network")
     monkeypatch.setattr(urllib.request, "urlopen", offline)
     assert c.get("/api/update").json() == {"current": "1.2.0", "latest": None, "available": False}
+
+
+# ---------- GET /api/mcp-config ----------
+def test_mcp_config_points_at_runnable_server(client):
+    import json, os
+    c, _ = client
+    d = c.get("/api/mcp-config").json()
+    assert os.access(d["command"], os.X_OK)
+    assert d["args"][0].endswith("mcp_transcribe.py") and Path(d["args"][0]).exists()
+    assert json.loads(d["json"])["mcpServers"]["transcribe"] == {"command": d["command"], "args": d["args"]}
+    assert d["claude_code"].startswith("claude mcp add --scope user transcribe -- ")

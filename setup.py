@@ -16,6 +16,7 @@ from settings import VERSION
 APP = ['app.py']
 
 DATA_FILES = [
+    ('', ['mcp_transcribe.py']),   # MCP server for AI apps, see /api/mcp-config
     ('static', ['static/index.html']),
     ('static/vendor/thinking-orbs', [
         'static/vendor/thinking-orbs/engine.js',

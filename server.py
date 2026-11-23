@@ -270,6 +270,25 @@ def open_update():
     return {"ok": True}
 
 
+@app.get("/api/mcp-config")
+def mcp_config():
+    """How an AI app (Claude, Cursor, LM Studio…) launches the MCP server of THIS
+    install. Bundle: its own python + Resources/mcp_transcribe.py, so users need
+    no python3 of their own. From source: the running interpreter + repo copy."""
+    import shlex
+    import sys
+    py = Path(sys.executable)
+    if py.name == "Transcribe":            # py2app main binary: the interpreter sits next to it
+        py = py.with_name("python")
+    script = STATIC_ROOT.parent / "mcp_transcribe.py"
+    cmd, args = str(py), [str(script)]
+    return {
+        "command": cmd, "args": args,
+        "claude_code": shlex.join(["claude", "mcp", "add", "--scope", "user", "transcribe", "--", cmd, *args]),
+        "json": json.dumps({"mcpServers": {"transcribe": {"command": cmd, "args": args}}}, indent=2),
+    }
+
+
 @app.get("/api/health")
 def health():
     return {

@@ -34,6 +34,33 @@ La première transcription télécharge le modèle Whisper large-v3 (environ 3 G
 - **Vocabulaire personnalisé** (Réglages) : noms propres et jargon, pour qu'ils soient bien orthographiés.
 - Résultat : copier le texte, ou exporter en `.md`, `.srt`, `.json`.
 
+## Brancher à une IA (MCP)
+
+L'app embarque un serveur [MCP](https://modelcontextprotocol.io), le standard que suivent Claude, Cursor, VS Code, LM Studio et d'autres. Une fois branchée, ton IA peut transcrire un fichier ou un lien elle-même (« transcris cette vidéo YouTube »). Elle ouvre l'app toute seule si besoin.
+
+Le plus simple : dans l'app, **Réglages › Brancher à une IA**, puis copie la commande ou la config.
+
+**Claude Code** (Terminal) :
+```bash
+claude mcp add --scope user transcribe -- /Applications/Transcribe.app/Contents/MacOS/python /Applications/Transcribe.app/Contents/Resources/mcp_transcribe.py
+```
+
+**Claude Desktop, Cursor et la plupart des autres** : ajoute ceci à leur fichier de config MCP (Claude Desktop : *Settings › Developer › Edit Config* ; Cursor : `~/.cursor/mcp.json`), puis redémarre l'app :
+```json
+{
+  "mcpServers": {
+    "transcribe": {
+      "command": "/Applications/Transcribe.app/Contents/MacOS/python",
+      "args": ["/Applications/Transcribe.app/Contents/Resources/mcp_transcribe.py"]
+    }
+  }
+}
+```
+
+Outils fournis : `transcrire_fichier`, `transcrire_url`, `suivre_transcription`, `lister_modeles`, `choisir_modele_defaut`.
+
+**IA sans MCP ou script** : l'app répond aussi en HTTP sur `http://127.0.0.1:7878` (en local seulement). `POST /api/jobs/local` avec `{"path": "/chemin/video.mp4", "language": "fr"}` ou `POST /api/jobs/url` avec `{"url": "…"}` renvoie un `job_id`. `GET /api/jobs/<job_id>` donne l'avancement, puis les fichiers produits.
+
 ## Mises à jour
 
 Quand une nouvelle version sort, un bouton **« Version x.y dispo »** apparaît en haut de l'app : il ouvre la page de téléchargement. Remplace l'ancienne app dans Applications par la nouvelle (tes réglages sont gardés).
