@@ -12,6 +12,11 @@ from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Optional
 
+# App version — publier.sh bumps it; the app compares it to the latest GitHub
+# release of UPDATE_REPO to tell users an update exists.
+VERSION = "1.0.0"
+UPDATE_REPO = "YesStonksMan/transcribe"
+
 
 # --------- Model catalog (built-in + user-added from Réglages) ---------
 

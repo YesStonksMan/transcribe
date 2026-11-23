@@ -34,6 +34,11 @@ La première transcription télécharge le modèle Whisper large-v3 (environ 3 G
 - **Vocabulaire personnalisé** (Réglages) : noms propres et jargon, pour qu'ils soient bien orthographiés.
 - Résultat : copier le texte, ou exporter en `.md`, `.srt`, `.json`.
 
+## Mises à jour
+
+Quand une nouvelle version sort, un bouton **« Version x.y dispo »** apparaît en haut de l'app : il ouvre la page de téléchargement. Remplace l'ancienne app dans Applications par la nouvelle (tes réglages sont gardés).
+C'est la seule connexion que fait l'app d'elle-même : elle demande à GitHub le numéro de la dernière version. Tes fichiers et transcriptions ne quittent jamais ton Mac.
+
 ## Lancer depuis le code
 
 ```bash

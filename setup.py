@@ -11,6 +11,7 @@ import sys
 sys.setrecursionlimit(5000)
 
 from setuptools import setup
+from settings import VERSION
 
 APP = ['app.py']
 
@@ -30,7 +31,7 @@ OPTIONS = {
         'CFBundleName': 'Transcribe',
         'CFBundleDisplayName': 'Transcribe',
         'CFBundleIdentifier': 'fr.adham.transcribe',
-        'CFBundleShortVersionString': '1.0.0',
+        'CFBundleShortVersionString': VERSION,
         'CFBundleVersion': '1',
         'NSHighResolutionCapable': True,
         'LSUIElement': False,

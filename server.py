@@ -243,6 +243,33 @@ def root():
     return FileResponse(STATIC_ROOT / "index.html")
 
 
+def _version_tuple(v: str) -> tuple[int, ...]:
+    return tuple(int(x) for x in re.findall(r"\d+", v))
+
+
+@app.get("/api/update")
+def get_update():
+    """Latest GitHub release vs this build. Offline or rate-limited = no update."""
+    import urllib.request
+    cur = _settings_mod.VERSION
+    url = f"https://api.github.com/repos/{_settings_mod.UPDATE_REPO}/releases/latest"
+    try:
+        with urllib.request.urlopen(url, timeout=5) as r:
+            latest = json.load(r)["tag_name"].lstrip("v")
+    except Exception:
+        return {"current": cur, "latest": None, "available": False}
+    return {"current": cur, "latest": latest,
+            "available": _version_tuple(latest) > _version_tuple(cur)}
+
+
+@app.post("/api/update/open")
+def open_update():
+    """Open the latest release page in the default browser (fixed URL)."""
+    import subprocess
+    subprocess.Popen(["open", f"https://github.com/{_settings_mod.UPDATE_REPO}/releases/latest"])
+    return {"ok": True}
+
+
 @app.get("/api/health")
 def health():
     return {

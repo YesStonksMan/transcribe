@@ -189,3 +189,19 @@ def test_delete_custom_model_also_drops_it_from_the_list(client, monkeypatch):
     ids = [m["id"] for m in c.get("/api/settings").json()["models"]]
     assert model_id not in ids
     assert "large-v3-turbo" in ids   # built-ins only lose their cache, never their entry
+
+
+# ---------- GET /api/update ----------
+def test_update_detects_newer_release_and_survives_offline(client, monkeypatch):
+    import io, json, urllib.request
+    c, server = client
+    monkeypatch.setattr(server._settings_mod, "VERSION", "1.2.0")
+    for tag, avail in [("v1.10.0", True), ("v1.2.0", False), ("v1.1.9", False)]:
+        monkeypatch.setattr(urllib.request, "urlopen",
+                            lambda *a, t=tag, **k: io.BytesIO(json.dumps({"tag_name": t}).encode()))
+        assert c.get("/api/update").json()["available"] is avail, tag
+
+    def offline(*a, **k):
+        raise OSError("no network")
+    monkeypatch.setattr(urllib.request, "urlopen", offline)
+    assert c.get("/api/update").json() == {"current": "1.2.0", "latest": None, "available": False}

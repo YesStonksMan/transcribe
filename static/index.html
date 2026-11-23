@@ -360,6 +360,7 @@ main{flex:1;display:flex;flex-direction:column;justify-content:center;
 .btn{height:36px;padding:0 14px;border:0;border-radius:var(--r-pill);font-weight:700;font-size:13px;
   background:var(--surface);color:var(--ink);box-shadow:var(--clay-sm);transition:transform .25s var(--spring);}
 .btn:active{transform:scale(.94);}
+.update-btn{padding:6px 14px;font-size:13px;}
 .btn-primary{background:linear-gradient(160deg,var(--accent-hi),var(--accent));color:#fff;box-shadow:var(--clay-accent);}
 .btn:disabled{opacity:.5;cursor:not-allowed;}
 .status-installed{font-size:12.5px;font-weight:800;color:var(--mint);}
@@ -401,10 +402,11 @@ main{flex:1;display:flex;flex-direction:column;justify-content:center;
   </div>
 </div>
 
-<!-- Icons: Phosphor duotone (MIT) — ~/Projet Perso/Icons Asset/phosphor-icons/SVGs/duotone/ -->
+<!-- Icons: Phosphor duotone (MIT) -->
 <header class="masthead">
   <span class="brand"><span class="logo"><svg viewBox="0 0 256 256" width="24" height="24" fill="currentColor" aria-hidden="true"><rect x="48" y="96" width="160" height="64" opacity="0.2"/><line x1="48" y1="96" x2="48" y2="160" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="88" y1="32" x2="88" y2="224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="128" y1="64" x2="128" y2="192" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="168" y1="96" x2="168" y2="160" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="208" y1="80" x2="208" y2="176" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg></span>Transcribe</span>
   <div class="mh-right">
+    <button id="update-btn" class="btn btn-primary update-btn" type="button" hidden>Mise à jour</button>
     <button id="settings-btn" class="icon-btn" type="button" aria-label="Paramètres" title="Paramètres">
       <svg viewBox="0 0 256 256" width="22" height="22" fill="currentColor" aria-hidden="true"><circle cx="104" cy="80" r="24" opacity="0.2"/><circle cx="168" cy="176" r="24" opacity="0.2"/><circle cx="104" cy="80" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><circle cx="168" cy="176" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="128" y1="80" x2="216" y2="80" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="40" y1="80" x2="80" y2="80" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="192" y1="176" x2="216" y2="176" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><line x1="40" y1="176" x2="144" y2="176" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg>
     </button>
@@ -1244,6 +1246,19 @@ tsSource.checked = tsToggle.checked;
 tsSource.addEventListener("change", () => { tsToggle.checked = tsSource.checked; tsToggle.dispatchEvent(new Event("change")); });
 tsToggle.addEventListener("change", () => { tsSource.checked = tsToggle.checked; });
 refreshQueue();
+
+// Update check: a newer GitHub release → show the pill; click opens its page.
+(async () => {
+  try {
+    const d = await (await fetch("/api/update")).json();
+    if (!d.available) return;
+    const b = document.getElementById("update-btn");
+    b.textContent = `Version ${d.latest} dispo`;
+    b.title = `Tu as la ${d.current}. Clique pour télécharger la nouvelle.`;
+    b.hidden = false;
+    b.onclick = () => fetch("/api/update/open", { method: "POST" });
+  } catch (e) {}
+})();
 </script>
 </body>
 </html>
